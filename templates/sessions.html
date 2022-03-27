@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-sm text-center">
+    <br>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert" style="background-color:#5E8B7E; color:white;">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %}
+    {% endwith %}
+</div>
+
+<div class="all-page-title page-breadcrumb">
+    <div class="container text-center">
+        <div class="row pt-5">
+            <div class="col-lg-12">
+                <h1>Sessions</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Pages -->
+
+<!-- Start Menu -->
+<div class="menu-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="special-menu text-center">
+                    <div class="button-group filter-button-group">
+                        {% if category == "fun" %}
+                        <button onclick="getFunSessions()" id="funButton" class="active menu-btn">Fun</button>
+                        {% else %}
+                        <button onclick="getFunSessions()" id="funButton" class="menu-btn">Fun</button>
+                        {% endif %}
+
+                        {% if category == "health" %}
+                        <button onclick="getHealthSessions()" id="healthButton" class="active menu-btn">Health</button>
+                        {% else %}
+                        <button onclick="getHealthSessions()" id="healthButton" class="menu-btn">Health</button>
+                        {% endif %}
+
+                        {% if category == "learn" %}
+                        <button onclick="getLearnSessions()" id="learnButton" class="active menu-btn">Learn</button>
+                        {% else %}
+                        <button onclick="getLearnSessions()" id="learnButton" class="menu-btn">Learn</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% set i = namespace(value=0) %}
+        {% set count = namespace(value=3) %}
+        {% for _ in range(number_of_rows) %}
+        <div class="row py-md-4 py-0">
+            {% for j in range(3) %}
+            {% set flag = namespace(value=0) %}
+            {% if i.value < total_items %} {% if i.value < count.value %} {% if all_items[i.value].quantity !='0' %}
+                <form class="col-md-4 col-12 py-3 ml-2 ml-lg-0">
+                <div class="card menu-item" style="width: 20rem">
+                    <h3 style="font-size: 32px" class="card-title pt-3 text-center">
+                        {{ all_items[i.value].name }}</h3>
+                    <h6 class="card-title pt-1 text-center">
+                        <strong>Posted By:</strong> @{{ user_names[i.value] }}
+                    </h6>
+                    <hr class="mx-5">
+                    <h4 class="text-center"><strong>Description</strong></h4>
+                    <div class="mx-3 desc-container">{{ all_items[i.value].desc[:120]|safe }}...</div>
+                    <hr class="mx-5">
+                    <div class="card-body text-center">
+                        {% if flag.value != 1 %}
+                        <button type="button" class="btn order-btn" data-toggle="modal"
+                                        data-target="#exampleModal{{ loop.index }}">
+                            View Details
+                        </button>
+                        {% endif %}
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ all_items[i.value].url }}" target="_blank" class="btn order-btn">
+                            Join Session
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('signup') }}" class="btn order-btn">
+                            Join Session
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal fade" id="exampleModal{{ loop.index }}" tabindex="-1"
+                    aria-labelledby="exampleModalLabel{{ loop.index }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel{{ loop.index }}">
+                                    Session Details</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <strong>Name :</strong> {{ all_items[i.value].name }}<br>
+                                <strong>Posted By :</strong> @{{ user_names[i.value] }}<br>
+                                <strong>Category :</strong> {{ category|capitalize }}<br>
+                                <strong>URL :</strong> <a target="_blank" href="{{ all_items[i.value].url }}">{{ all_items[i.value].url }}</a> <br>
+                                <strong>Description :</strong> {{ all_items[i.value].desc|safe }} <br>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </form>
+                {% endif %}
+                {% set i.value = i.value + 1 %}
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+                {% set count.value = i.value * 2 %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- End Menu -->
+
+{% endblock %}
